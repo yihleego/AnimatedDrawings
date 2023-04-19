@@ -16,10 +16,11 @@ node_modules
 
 # ignore any files created by following examples
 **/log.txt
-examples/garlic_out
+examples/*_out
 **/*.mp4
 **/*.gif
 
 # DO include .gifs used by the Readme
 !media/*.gif
 
+.idea
