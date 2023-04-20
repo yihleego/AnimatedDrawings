@@ -142,33 +142,14 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
     # save mask
     cv2.imwrite(str(outdir/'mask.png'), mask)
 
-    # mask = np.zeros_like(img)
+    # save full mask
     full_mask = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)
-    print('img size', (img.shape[0], img.shape[1]))
-    print('mask size', (mask.shape[0], mask.shape[1]))
-    print('point', (t, l), (t + mask.shape[1], l + mask.shape[0]))
     full_mask[t:b, l:r] = mask
     cv2.imwrite(str(outdir/'full_mask.png'), full_mask)
 
-    # 计算掩码的反向
-    mask_inv = cv2.bitwise_not(full_mask)
-
-    # 用掩码将原始图像中的区域遮盖
-    img_masked = cv2.bitwise_and(img, img, mask=mask_inv)
-
-    # 创建空白背景
-    background = np.zeros(img.shape, dtype=np.uint8)
-
-    # 用掩码将背景图像中的区域遮盖
-    bg_masked = cv2.bitwise_and(background, background, mask=full_mask)
-
-    # 合并两个图像
-    result = cv2.add(img_masked, bg_masked)
-    cv2.imwrite(str(outdir/'masked.png'), result)
-
-    # 合并两个图像
-    result2 = cv2.inpaint(img, full_mask, 3, cv2.INPAINT_TELEA)
-    cv2.imwrite(str(outdir/'background.png'), result2)
+    # save background
+    background = cv2.inpaint(img, full_mask, 3, cv2.INPAINT_TELEA)
+    cv2.imwrite(str(outdir/'background.png'), background)
 
     # dump character config to yaml
     with open(str(outdir/'char_cfg.yaml'), 'w') as f:
